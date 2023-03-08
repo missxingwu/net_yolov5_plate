@@ -27,7 +27,7 @@ namespace Yolov7Ml
 
             yoloOcr.SetupYoloDefaultLabels(); // use custom trained model should use your labels like: yolo.SetupLabels(string[] labels)
 
-            OctTest octTest = new OctTest();
+         
 
 
             foreach (var item in dirPos)
