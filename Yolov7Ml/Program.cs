@@ -1,4 +1,6 @@
-﻿using System.Drawing;
+﻿using OpenCvSharp;
+using OpenCvSharp.Extensions;
+using System.Drawing;
 using System.Drawing.Imaging;
 using Yolov7net;
 
@@ -11,12 +13,12 @@ namespace Yolov7Ml
 
 
             /*-------------------------定义检测范围---------------------------------------------*/
-            /// using var yolo = new Yolov7("./assets/yolov7-tiny.onnx"); //yolov7 e2e 模型,不需要 nms 操作
-            using var yolo = new Yolov5("./assets/plate_detect.onnx", inputName: "input"); //yolov7 e2e 模型,不需要 nms 操作
+            using var yolo = new Yolov5("./assets/plate_detect_v7.onnx", inputName: "input"); //yolov7 e2e 模型,不需要 nms 操作
+            /// using var yolo = new Yolov5("./assets/plate_detect.onnx", inputName: "input"); //yolov7 e2e 模型,不需要 nms 操作
                                                                                            // setup labels of onnx model 
 
             yolo.SetupYoloDefaultLabels(); // use custom trained model should use your labels like: yolo.SetupLabels(string[] labels)
-            var dirPos = Directory.GetFiles(@"./Assets");
+            var dirPos = Directory.GetFiles(@"./Assets/input");
             var dtNow = DateTime.Now.Hour.ToString() + DateTime.Now.Minute.ToString() + DateTime.Now.Second.ToString();
 
             /*-------------------------定义识别结果---------------------------------------------*/
@@ -25,7 +27,7 @@ namespace Yolov7Ml
 
             yoloOcr.SetupYoloDefaultLabels(); // use custom trained model should use your labels like: yolo.SetupLabels(string[] labels)
 
-           
+            OctTest octTest = new OctTest();
 
 
             foreach (var item in dirPos)
@@ -52,13 +54,15 @@ namespace Yolov7Ml
                         var twoLayers = (labelRect.Height / labelRect.Width) > 0.5;
 
                         //定义截取矩形
-                        System.Drawing.Rectangle cropArea = new System.Drawing.Rectangle((int)labelRect.X, (int)labelRect.Y, (int)labelRect.Width, (int)labelRect.Height);
+                        System.Drawing.Rectangle cropArea = new System.Drawing.Rectangle((int)labelRect.X < 0 ? 0 : (int)labelRect.X, (int)labelRect.Y < 0 ? 0 : (int)labelRect.Y, (int)labelRect.Width, (int)labelRect.Height);
                         //定义Bitmap对象
                         System.Drawing.Bitmap bmpImage = new System.Drawing.Bitmap(image);
                         //进行裁剪
                         System.Drawing.Bitmap bmpCrop = bmpImage.Clone(cropArea, bmpImage.PixelFormat);
                         //保存成新文件
                         // bmpCrop.Save(Path.Combine(path, (fileName + "_" + dtNow + "_clone.png")), ImageFormat.Png);
+
+                    
 
                         if (twoLayers)
                         {
@@ -98,7 +102,6 @@ namespace Yolov7Ml
                         //    stream.Read(data, 0, Convert.ToInt32(stream.Length));
                         //    // backtxt = ocrTxt.GetTest(data);
                         //}
-
 
 
 
