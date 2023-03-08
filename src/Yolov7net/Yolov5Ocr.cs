@@ -1,5 +1,7 @@
 ﻿using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
+using OpenCvSharp;
+using OpenCvSharp.Extensions;
 using System;
 using System.Collections.Concurrent;
 using System.Drawing;
@@ -64,7 +66,7 @@ namespace Yolov7net
             SetupLabels(s);
         }
 
-        public string[] Predict(Image image, float conf_thres = 0, float iou_thres = 0)
+        public string[] Predict(Bitmap image, float conf_thres = 0, float iou_thres = 0)
         {
             if (conf_thres > 0f)
             {
@@ -112,23 +114,24 @@ namespace Yolov7net
             return result;
         }
 
-        private DenseTensor<float>[] Inference(Image img)
+        private DenseTensor<float>[] Inference(Bitmap img)
         {
-            Bitmap resized = null;
-
+            Mat imgData = new Mat();
+            var smatimg = BitmapConverter.ToMat(img);
             if (img.Width != _model.Width || img.Height != _model.Height)
             {
-                resized = Utils.ResizeImage(img, _model.Width, _model.Height); // fit image size to specified input size
+                
+                Cv2.Resize(smatimg, imgData, new OpenCvSharp.Size { Width = _model.Width, Height = _model.Height });
             }
             else
             {
-                resized = new Bitmap(img);
+                Cv2.Resize(smatimg, imgData, new OpenCvSharp.Size { Width = img.Width, Height = img.Height });
             }
 
             var inputs = new List<NamedOnnxValue> // add image as onnx input
             {              
 
-              NamedOnnxValue.CreateFromTensor(_inputName, Utils.ExtractPixels(resized))
+              NamedOnnxValue.CreateFromTensor(_inputName, Utils.ExtractPixelsFloat(imgData))
             };
 
 
