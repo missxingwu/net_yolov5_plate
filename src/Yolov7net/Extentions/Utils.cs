@@ -93,11 +93,7 @@ namespace Yolov7net.Extentions
             float[] meanVals = { 0.485F * 255F, 0.456F * 255F, 0.406F * 255F };
             float[] normVals = { 1.0F / 0.229F / 255.0F, 1.0F / 0.224F / 255.0F, 1.0F / 0.225F / 255.0F };
             int cols = src.Cols;
-            int rows = src.Rows;
-
-            //  var srcImg = 
-            var imgData = new byte[src.Total() * 3];// srcImg.Data;
-            Marshal.Copy(src.Data, imgData, 0, imgData.Length);
+            int rows = src.Rows;            
 
             Tensor<float> inputTensor = new DenseTensor<float>(new[] { 1, 3, rows, cols });
             for (int i = 0; i < rows; ++i)
